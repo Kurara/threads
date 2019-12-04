@@ -21,7 +21,7 @@ class ThreadsText(unittest.TestCase):
     def test_basic_thread(self):
         # creating thread 
         t1 = threading.Thread(
-            target=BaseThreading.print_square, args=(10,)
+            target=BaseThreading.print_square, args=(10,), daemon=True
         ) 
         t2 = threading.Thread(
             target=BaseThreading.print_cube, args=(10,)
@@ -94,3 +94,26 @@ class ThreadsText(unittest.TestCase):
             t2.join() 
 
             logger.info("Iteration {0}: x = {1}".format(i,thread_manager.x))
+
+    def test_pipeline(self):
+        from pipeline import ThreadPipeline, Pipeline
+        import concurrent.futures
+
+        pipeline = Pipeline()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            executor.submit(ThreadPipeline.producer, pipeline)
+            executor.submit(ThreadPipeline.consumer, pipeline)
+
+    def test_event(self):
+        from pipeline import EventPipeline, Pipeline
+        import concurrent.futures
+
+        pipeline = Pipeline()
+        event = threading.Event()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            executor.submit(EventPipeline.producer, pipeline, event)
+            executor.submit(EventPipeline.consumer, pipeline, event)
+
+            time.sleep(0.1)
+            logging.info("Main: about to set event")
+            event.set()

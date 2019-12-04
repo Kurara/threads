@@ -28,14 +28,13 @@ class BaseThreading:
     def thread_function(name):
         import os
 
-        logging.info("ID of process running task: {}".format(os.getpid()))
-        logging.info("Thread %s: starting", name)
-        time.sleep(2)
-        logging.info("Thread %s: finishing", name)
+        logger.info("ID of process running task: {}".format(os.getpid()))
+        logger.info("Thread %s: starting", name)
+        time.sleep(20)
+        logger.info("Thread %s: finishing", name)
 
 
 class RaceThreading:
-    import threading 
   
     # global variable x 
     def __init__(self):
@@ -60,7 +59,7 @@ class RaceThreading:
         task for thread 
         calls increment function 100000 times. 
         """
+        lock.acquire() 
         for _ in range(100000): 
-            lock.acquire() 
             self.increment() 
-            lock.release() 
+        lock.release() 
